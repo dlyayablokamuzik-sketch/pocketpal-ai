@@ -56,7 +56,28 @@ jobs:
               {
                 "client_info": {
                   "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpalai.e2e" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              },
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
                   "android_client_info": { "package_name": "com.pocketpal" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              },
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpal.debug" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              },
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpal.e2e" }
                 },
                 "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
               }
@@ -64,10 +85,13 @@ jobs:
             "configuration_version": "1"
           }
           EOF
+          mkdir -p android/app/src/debug android/app/src/e2eDebug
+          cp android/app/google-services.json android/app/src/debug/google-services.json
+          cp android/app/google-services.json android/app/src/e2eDebug/google-services.json
 
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleStandardDebug || ./gradlew assembleDebug -x processE2eDebugGoogleServices
+        run: ./gradlew assembleDebug -x assembleE2eDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
