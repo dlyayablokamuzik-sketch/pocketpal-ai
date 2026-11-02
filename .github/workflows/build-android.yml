@@ -23,6 +23,7 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: 'gradle'
 
       - name: Install dependencies
         run: yarn install --ignore-engines
@@ -91,11 +92,15 @@ jobs:
 
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug -x assembleE2eDebug
+        env:
+          ORG_GRADLE_PROJECT_reactNativeArchitectures: arm64-v8a
+          GRADLE_OPTS: -Dorg.gradle.jvmargs="-Xmx4096m -XX:MaxMetaspaceSize=1024m"
+        run: ./gradlew assembleDebug -x assembleE2eDebug -PreactNativeArchitectures=arm64-v8a --max-workers=2 --no-daemon
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PocketPal-Custom-APK
           path: android/app/build/outputs/apk/**/debug/*.apk
+          
           
