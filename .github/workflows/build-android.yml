@@ -2,6 +2,8 @@ name: Build Custom PocketPal APK
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build-android:
@@ -10,10 +12,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '22'
           cache: 'yarn'
 
       - name: Set up JDK 17
@@ -23,7 +25,12 @@ jobs:
           distribution: 'temurin'
 
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --ignore-engines
+
+      - name: Prepare environment files
+        run: |
+          if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi
+          touch .env
 
       - name: Build Debug APK
         working-directory: ./android
@@ -33,5 +40,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: PocketPal-Custom-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: android/app/build/outputs/apk/debug/*.apk
           
