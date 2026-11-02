@@ -31,14 +31,47 @@ jobs:
         run: |
           if [ -f .env.example ] && [ ! -f .env ]; then cp .env.example .env; fi
           touch .env
+          cat << 'EOF' > android/app/google-services.json
+          {
+            "project_info": {
+              "project_number": "123456789000",
+              "project_id": "pocketpal-local",
+              "storage_bucket": "pocketpal-local.appspot.com"
+            },
+            "client": [
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpalai" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              },
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpalai.debug" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              },
+              {
+                "client_info": {
+                  "mobilesdk_app_id": "1:123456789000:android:1234567890abcdef",
+                  "android_client_info": { "package_name": "com.pocketpal" }
+                },
+                "api_key": [{ "current_key": "AIzaSyDummyKeyForLocalBuild123456789" }]
+              }
+            ],
+            "configuration_version": "1"
+          }
+          EOF
 
       - name: Build Debug APK
         working-directory: ./android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleStandardDebug || ./gradlew assembleDebug -x processE2eDebugGoogleServices
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: PocketPal-Custom-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/**/debug/*.apk
           
